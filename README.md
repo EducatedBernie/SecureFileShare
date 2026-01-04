@@ -8,6 +8,11 @@ A secure, Dropbox-like file sharing system designed to protect user data against
 
 ---
 
+## Blog Post
+
+For a detailed walkthrough of the design evolution, including the failures that led to the final architecture, see: [I Built a Dropbox Clone That Even the Server Can't Read](#) *([link to your blog post](https://medium.com/@berniem4483/i-built-a-dropbox-clone-that-even-the-server-cant-read-8599f15647c6))*
+
+
 ## Overview
 
 This project implements a client-side application for secure file storage and sharing. The system guarantees confidentiality and integrity of user data even when the storage server is completely untrusted—it can read, modify, or delete any stored data.
@@ -127,14 +132,7 @@ This repository contains design documentation only. Per UC Berkeley's academic i
 
 ---
 
-## Blog Post
-
-For a detailed walkthrough of the design evolution, including the failures that led to the final architecture, see: [I Built a Dropbox Clone That Even the Server Can't Read](#) *(link to your blog post)*
-
----
-
 ## Acknowledgments
 
 - **Lyna Jiang** – Project partner and co-designer
-- **UC Berkeley CS 161 Course Staff** – For designing a project that teaches security through pain
-- This README and accompanying blog post were edited with AI assistance. The project work and design decisions are our own.
+- **UC Berkeley CS 161 Course Staff** – For designing a project that teaches security through pain.
