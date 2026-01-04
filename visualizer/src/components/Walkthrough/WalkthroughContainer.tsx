@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Node, Edge } from 'reactflow';
 import { walkthroughSteps, DiagramState } from './walkthroughSteps';
+import { introVisuals } from './IntroVisuals';
 
 const DiagramCanvas = dynamic(
   () => import('@/components/Diagram/DiagramCanvas'),
@@ -385,39 +386,57 @@ export default function WalkthroughContainer() {
 
       {/* Diagram area - takes remaining space */}
       <div className="flex-1 min-h-0 bg-[#0a0a0f] relative">
-        {nodes.length > 0 ? (
-          <div className="absolute inset-0">
-            <DiagramCanvas
-              key={`walkthrough-${currentStep}`}
-              initialNodes={nodes}
-              initialEdges={edges}
-            />
-          </div>
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center max-w-lg px-4">
-              <div className="text-6xl mb-6">🔐</div>
-              <h2 className="text-2xl font-light text-zinc-300 mb-3">
-                End-to-End Encrypted File Sharing
-              </h2>
-              <p className="text-zinc-400 mb-6 leading-relaxed">
-                A deep dive into the cryptographic architecture that enables secure file sharing
-                with an untrusted server—built for UC Berkeley&apos;s CS 161 Computer Security course.
-              </p>
-              <a
-                href="https://medium.com/@berniem4483/8599f15647c6"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors"
-              >
-                <span>Read more about the threat model</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        )}
+        {(() => {
+          // Check if this step has a custom intro visual
+          const IntroVisual = introVisuals[step.id];
+
+          if (IntroVisual) {
+            // Use custom intro visual for conceptual slides
+            return (
+              <div className="absolute inset-0">
+                <IntroVisual />
+              </div>
+            );
+          } else if (nodes.length > 0) {
+            // Use diagram for technical slides
+            return (
+              <div className="absolute inset-0">
+                <DiagramCanvas
+                  key={`walkthrough-${currentStep}`}
+                  initialNodes={nodes}
+                  initialEdges={edges}
+                />
+              </div>
+            );
+          } else {
+            // Fallback empty state (shouldn't happen with intro visuals)
+            return (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center max-w-lg px-4">
+                  <div className="text-6xl mb-6">🔐</div>
+                  <h2 className="text-2xl font-light text-zinc-300 mb-3">
+                    End-to-End Encrypted File Sharing
+                  </h2>
+                  <p className="text-zinc-400 mb-6 leading-relaxed">
+                    A deep dive into the cryptographic architecture that enables secure file sharing
+                    with an untrusted server—built for UC Berkeley&apos;s CS 161 Computer Security course.
+                  </p>
+                  <a
+                    href="https://medium.com/@berniem4483/8599f15647c6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    <span>Read more about the threat model</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            );
+          }
+        })()}
       </div>
     </div>
   );
