@@ -18,11 +18,11 @@ export interface WalkthroughStep {
 }
 
 export const walkthroughSteps: WalkthroughStep[] = [
-  // Act 1: The Setup
+  // Intro: Context and Threat Model
   {
     id: 1,
-    title: "The Challenge",
-    narrative: "The assignment was deceptively simple: build a Dropbox-like system where the server never sees your files. End-to-end encryption. Zero knowledge. The works.",
+    title: "Welcome",
+    narrative: "This visualizer explores the architecture of a secure, end-to-end encrypted file sharing system—built as part of UC Berkeley's CS 161 Computer Security course.",
     diagram: {
       users: [],
       files: [],
@@ -32,6 +32,74 @@ export const walkthroughSteps: WalkthroughStep[] = [
   },
   {
     id: 2,
+    title: "Two Adversaries",
+    narrative: "The system defends against two distinct threats that don't collude. Understanding both is key to understanding why the architecture looks the way it does.",
+    diagram: {
+      users: [],
+      files: [],
+      shares: [],
+      showIntNodes: false,
+    },
+  },
+  {
+    id: 3,
+    title: "Adversary #1: The Server",
+    narrative: "The Datastore Adversary controls the storage server completely. It can read, modify, and delete ANY data. It observes all API calls and knows your source code. But it cannot enumerate what it doesn't know exists.",
+    diagram: {
+      users: [],
+      files: [],
+      shares: [],
+      showIntNodes: false,
+    },
+    note: "Per Kerckhoff's principle—security through obscurity is not security.",
+  },
+  {
+    id: 4,
+    title: "Adversary #2: The Revoked User",
+    narrative: "A previously authorized user whose access was revoked. Before revocation, they recorded UUIDs, keys, and values. After revocation, they can still directly access the server—but only at locations they already know.",
+    diagram: {
+      users: [],
+      files: [],
+      shares: [],
+      showIntNodes: false,
+    },
+    note: "Unlike the server, revoked users have limited visibility but active attack capability.",
+  },
+  {
+    id: 5,
+    title: "What We Must Protect",
+    narrative: "Confidentiality of file contents and filenames (IND-CPA security). Post-revocation secrecy—revoked users learn nothing about future updates. Integrity—detect any tampering. Authorization—only valid users access files.",
+    diagram: {
+      users: [],
+      files: [],
+      shares: [],
+      showIntNodes: false,
+    },
+  },
+  {
+    id: 6,
+    title: "The Constraints",
+    narrative: "Users authenticate with username/password only. No PKI, no trusted third party. The server provides storage but zero trust. Users must be able to share files and revoke access at will.",
+    diagram: {
+      users: [],
+      files: [],
+      shares: [],
+      showIntNodes: false,
+    },
+  },
+  {
+    id: 7,
+    title: "The Challenge",
+    narrative: "Build a Dropbox-like system where the server never sees your files. End-to-end encryption. Zero knowledge. And efficient append operations—adding 100 bytes to a 10TB file shouldn't re-upload the whole thing.",
+    diagram: {
+      users: [],
+      files: [],
+      shares: [],
+      showIntNodes: false,
+    },
+  },
+  {
+    id: 8,
     title: "The Key Insight",
     narrative: "Encryption isn't the hard part—it's key management. Anyone can encrypt a file. But sharing encrypted files while supporting revocation? That's where things get interesting.",
     diagram: {
@@ -42,7 +110,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 3,
+    id: 9,
     title: "Alice Creates a File",
     narrative: "Alice wants to share a file. She encrypts it with a symmetric key, storing it on the server. She keeps her key in her personal mailbox—encrypted with her own public key.",
     diagram: {
@@ -54,7 +122,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 4,
+    id: 10,
     title: "Sharing with Bob",
     narrative: "Alice wants to share with Bob. She encrypts the file key with Bob's public key and places it in Bob's mailbox. Now Bob can decrypt too.",
     diagram: {
@@ -65,7 +133,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 5,
+    id: 11,
     title: "Bob Shares with Carol",
     narrative: "Bob decides Carol should have access too. He copies his key to Carol's mailbox. Simple, right?",
     diagram: {
@@ -77,7 +145,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
   },
   // Act 2: The Problem
   {
-    id: 6,
+    id: 12,
     title: "The Revocation Problem",
     narrative: "Now Alice wants to revoke Bob's access. She re-encrypts the file with a NEW key, updates her mailbox... but what about Carol?",
     diagram: {
@@ -89,7 +157,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 7,
+    id: 13,
     title: "Alice Can't See Carol",
     narrative: "Alice doesn't even know Carol exists! Bob shared with her directly. Carol's mailbox still points to the OLD file location with the OLD key.",
     diagram: {
@@ -104,7 +172,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     note: "Carol's mailbox is now a dangling pointer!",
   },
   {
-    id: 8,
+    id: 14,
     title: "The Dilemma",
     narrative: "Either Carol keeps access (defeating revocation) or Carol loses access even though Alice only revoked Bob. Both outcomes are wrong.",
     diagram: {
@@ -117,7 +185,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
   },
   // Act 3: The Solution
   {
-    id: 9,
+    id: 15,
     title: "Enter the IntNode",
     narrative: "The solution: add an intermediate layer. Instead of mailboxes pointing directly to the file, they point to an IntNode (intermediate node) which then points to the file.",
     diagram: {
@@ -129,7 +197,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 10,
+    id: 16,
     title: "Owner's IntNode",
     narrative: "When Alice creates a file, she gets her own IntNode. This IntNode contains the file's symmetric key and points to the actual FileStruct.",
     diagram: {
@@ -140,7 +208,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 11,
+    id: 17,
     title: "Sharing Creates New IntNode",
     narrative: "When Alice (the owner) shares with Bob, she creates a NEW IntNode for Bob. Bob's mailbox points to his IntNode, which points to the file.",
     diagram: {
@@ -153,7 +221,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     note: "Owner sharing = NEW IntNode",
   },
   {
-    id: 12,
+    id: 18,
     title: "Non-Owner Shares Same IntNode",
     narrative: "When Bob shares with Carol, something different happens. Carol joins Bob's EXISTING IntNode—she becomes part of Bob's \"cohort.\"",
     diagram: {
@@ -166,7 +234,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     note: "Non-owner sharing = SAME IntNode (joins cohort)",
   },
   {
-    id: 13,
+    id: 19,
     title: "The Cohort Structure",
     narrative: "Now we have a clear structure: Alice has her IntNode, Bob and Carol share another. Each IntNode represents a \"cohort\" of users who got access through the same path.",
     diagram: {
@@ -178,7 +246,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
   },
   // Act 4: Revocation Works
   {
-    id: 14,
+    id: 20,
     title: "Revocation with IntNodes",
     narrative: "Now when Alice revokes Bob, she simply DELETES Bob's IntNode. One operation severs access for Bob AND everyone in his cohort.",
     diagram: {
@@ -191,7 +259,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 15,
+    id: 21,
     title: "Clean Severance",
     narrative: "Bob and Carol both lose access. But Alice's IntNode is untouched—she still has access. And if she had shared with Dave directly, his IntNode would be untouched too.",
     diagram: {
@@ -204,7 +272,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
   },
   // Act 5: The Deeper Insight
   {
-    id: 16,
+    id: 22,
     title: "Why This Works",
     narrative: "The magic is in the two-layer indirection. Alice can't track every downstream user, but she CAN track the IntNodes she created. Each IntNode is a revocation handle.",
     diagram: {
@@ -215,7 +283,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 17,
+    id: 23,
     title: "After Revocation Update",
     narrative: "After deleting Bob's IntNode, Alice re-encrypts the file, moves it to a new location, and updates her remaining IntNodes (her own and Dave's) to point to the new location.",
     diagram: {
@@ -228,7 +296,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     note: "Alice only needs to update IntNodes she controls",
   },
   {
-    id: 18,
+    id: 24,
     title: "The Principle",
     narrative: "Revoke the person, sever the cohort. It's elegant because it accepts reality: Alice can't control what Bob does after sharing, but she CAN control the access point she gave him.",
     diagram: {
@@ -244,7 +312,7 @@ export const walkthroughSteps: WalkthroughStep[] = [
     },
   },
   {
-    id: 19,
+    id: 25,
     title: "Conclusion",
     narrative: "This is the IntNode pattern: a layer of indirection that transforms an intractable key management problem into a simple graph operation. Try it yourself in the Sandbox!",
     diagram: {

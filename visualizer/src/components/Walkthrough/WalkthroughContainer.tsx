@@ -395,14 +395,26 @@ export default function WalkthroughContainer() {
           </div>
         ) : (
           <div className="h-full flex items-center justify-center">
-            <div className="text-center max-w-md px-4">
-              <div className="text-6xl mb-4">🔐</div>
-              <h2 className="text-2xl font-light text-zinc-400 mb-2">
+            <div className="text-center max-w-lg px-4">
+              <div className="text-6xl mb-6">🔐</div>
+              <h2 className="text-2xl font-light text-zinc-300 mb-3">
                 End-to-End Encrypted File Sharing
               </h2>
-              <p className="text-zinc-500">
-                Click Next to begin the walkthrough
+              <p className="text-zinc-400 mb-6 leading-relaxed">
+                A deep dive into the cryptographic architecture that enables secure file sharing
+                with an untrusted server—built for UC Berkeley&apos;s CS 161 Computer Security course.
               </p>
+              <a
+                href="https://medium.com/@berniem4483/8599f15647c6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                <span>Read more about the threat model</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
             </div>
           </div>
         )}

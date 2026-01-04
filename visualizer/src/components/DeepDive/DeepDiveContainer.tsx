@@ -251,6 +251,54 @@ const cryptoPrimitives = [
   { name: 'Hashing', algorithm: 'SHA-512', usage: 'UUID generation, user identification' },
 ];
 
+const threatModel = {
+  adversaries: [
+    {
+      name: 'Datastore Adversary',
+      color: 'red',
+      description: 'The malicious storage server',
+      capabilities: [
+        'Read, modify, and delete ANY stored data',
+        'Observe all API calls (who, what, when)',
+        'Take snapshots to compare before/after states',
+        'Full access to source code (Kerckhoff\'s principle)',
+      ],
+      limitations: [
+        'Cannot perform rollback attacks (won\'t revert to old values)',
+        'Cannot modify data mid-function-execution',
+        'Cannot enumerate UUIDs it doesn\'t already know',
+      ],
+    },
+    {
+      name: 'Revoked User Adversary',
+      color: 'amber',
+      description: 'A previously authorized user whose access was revoked',
+      capabilities: [
+        'Recorded UUIDs, keys, and values before revocation',
+        'Can directly call Datastore APIs after revocation',
+        'Can read/write at any UUID they previously knew',
+      ],
+      limitations: [
+        'Cannot enumerate all UUIDs on the server',
+        'Only knows locations they previously accessed',
+        'Limited visibility vs. server (targeted attacks only)',
+      ],
+    },
+  ],
+  securityProperties: [
+    { name: 'File Confidentiality', description: 'IND-CPA security—server learns nothing beyond data sizes' },
+    { name: 'Filename Confidentiality', description: 'Both names and name lengths are hidden' },
+    { name: 'Post-Revocation Secrecy', description: 'Revoked users learn nothing about future updates' },
+    { name: 'Integrity', description: 'All tampering is detected—functions return errors' },
+    { name: 'Authorization', description: 'Only owner and valid invitees can access files' },
+  ],
+  designConstraints: [
+    { name: 'No Local Storage', description: 'All persistent state on Datastore—multiple sessions must sync' },
+    { name: 'Constant Keystore Entries', description: 'Each user stores only 2 public keys (encryption + signing)' },
+    { name: 'Efficient Append', description: 'Appending 100 bytes to 10TB file uses ~100 bytes bandwidth' },
+  ],
+};
+
 export default function DeepDiveContainer() {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -269,6 +317,84 @@ export default function DeepDiveContainer() {
           <p className="text-zinc-400">
             Explore each layer of the E2E encrypted file sharing system. Click any component to see implementation details.
           </p>
+        </div>
+
+        {/* Threat Model Section */}
+        <div className="mb-10">
+          <h2 className="text-xl font-bold text-zinc-100 mb-4">Threat Model</h2>
+
+          {/* Adversaries */}
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            {threatModel.adversaries.map((adversary) => (
+              <div
+                key={adversary.name}
+                className={`bg-zinc-900/50 border rounded-lg p-4 ${
+                  adversary.color === 'red' ? 'border-red-800/50' : 'border-amber-800/50'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    adversary.color === 'red' ? 'bg-red-500' : 'bg-amber-500'
+                  }`} />
+                  <h3 className={`font-semibold ${
+                    adversary.color === 'red' ? 'text-red-400' : 'text-amber-400'
+                  }`}>{adversary.name}</h3>
+                </div>
+                <p className="text-zinc-500 text-sm mb-3">{adversary.description}</p>
+
+                <div className="space-y-2">
+                  <div>
+                    <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Can:</span>
+                    <ul className="mt-1 space-y-1">
+                      {adversary.capabilities.map((cap, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-zinc-400">
+                          <span className="text-red-500 mt-0.5">•</span>
+                          <span>{cap}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Cannot:</span>
+                    <ul className="mt-1 space-y-1">
+                      {adversary.limitations.map((lim, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-zinc-400">
+                          <span className="text-emerald-500 mt-0.5">×</span>
+                          <span>{lim}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Security Properties */}
+          <div className="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 mb-4">
+            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Security Properties</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {threatModel.securityProperties.map((prop) => (
+                <div key={prop.name} className="text-sm">
+                  <span className="text-emerald-400 font-medium">{prop.name}:</span>
+                  <span className="text-zinc-500 ml-1">{prop.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Design Constraints */}
+          <div className="bg-zinc-900/30 border border-zinc-800 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Design Constraints</h3>
+            <div className="space-y-2">
+              {threatModel.designConstraints.map((constraint) => (
+                <div key={constraint.name} className="flex items-start gap-2 text-sm">
+                  <span className="text-indigo-400 font-medium shrink-0">{constraint.name}:</span>
+                  <span className="text-zinc-500">{constraint.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Data Flow Overview */}
